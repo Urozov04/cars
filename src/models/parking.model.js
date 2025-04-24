@@ -1,0 +1,33 @@
+import mongoose from "mongoose";
+
+const parkingSchema = new mongoose.Schema({
+    location: {
+        type: String,
+        trim: true,
+        required: true,
+    },
+    slotNumber: {
+        type: Number,
+        required: true,
+    },
+    isBooked: {
+        type: Boolean,
+        required: true,
+    },
+    bookedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "user",
+    },
+    car: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "car",
+    },
+    bookedAt: {
+        type: Date,
+    },
+},
+    {
+        timestamps: true
+    });
+
+export const Parking = mongoose.model("parking", parkingSchema);

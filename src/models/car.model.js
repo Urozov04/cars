@@ -1,0 +1,29 @@
+import mongoose from "mongoose";
+
+const carSchema = new mongoose.Schema({
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "user",
+        required: true,
+    },
+    plateNumber: {
+        type: String,
+        required: true,
+        trim: true,
+    },
+    model: {
+        type: String,
+        required: true,
+        trim: true,
+    },
+    color: {
+        type: String,
+        required: true,
+        trim: true,
+    },
+},
+{
+        timestamps: true
+    });
+
+export const Car = mongoose.model("car", carSchema);
