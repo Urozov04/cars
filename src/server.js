@@ -1,14 +1,23 @@
 import express from "express";
 import dotenv from "dotenv";
+import cookieParser from "cookie-parser"
 import { connectDB } from "./db/db.js";
-
+import userRouter from "./routes/user.routes.js"
+import carRouter from "./routes/car.routes.js"
+import parkingRouter from "./routes/parking.routes.js"
 dotenv.config();
 
 const app = express();
 
-app.use(express.json());
-const PORT = process.env.PORT || 3000;
+const PORT = +(process.env.PORT) || 3000;
 
+app.use(express.json());
+app.use(cookieParser())
+await connectDB()
+
+app.use("/user", userRouter)
+app.use("/car", carRouter)
+app.use("/parking", parkingRouter)
 
 connectDB().then(() => {
     app.listen(PORT, () => {

@@ -30,4 +30,5 @@ const parkingSchema = new mongoose.Schema({
         timestamps: true
     });
 
-export const Parking = mongoose.model("parking", parkingSchema);
+const Parking = mongoose.model("parking", parkingSchema);
+export default Parking;

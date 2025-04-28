@@ -9,7 +9,7 @@ export class UserController {
         try {
             const { error, value } = userValidation(req.body);
             if (error) {
-                throw new Error(`Error on creating user: ${error}`);
+                catchError(res, 400, error)
             }
 
             const { fullName, email, password } = value;
@@ -22,19 +22,46 @@ export class UserController {
                 });
             }
 
-            const hashedPassword = await decode(password, 7);
+            const hashedPassword = await decode(password, 10);
 
             const user = await User.create({
-                fullName,
-                email,
-                password: hashedPassword,
-                role: "user"
+                fullName, email, password: hashedPassword, role: "user"
             });
 
             return res.status(201).json({
                 statusCode: 201,
                 message: "success",
                 data: user
+            });
+        } catch (error) {
+            catchError(error, res, error.message);
+        }
+    }
+
+    async signinUser(req, res) {
+        try {
+            const { email, password } = req.body;
+            const user = await User.findOne({ email });
+            if (!user) {
+                catchError(res, 404, "User not found")
+            }
+
+            const isMatch = await encode(password, user.password);
+            if (!isMatch) {
+                catchError(res, 400, "Invalid password")
+            }
+
+            const payload = { id: user._id, role: user.role };
+            const accessToken = generateAccessToken(payload);
+            const refreshToken = generateRefreshToken(payload);
+
+            return res.status(200).json({
+                statusCode: 200,
+                message: "success",
+                data: {
+                    accessToken,
+                    refreshToken
+                }
             });
         } catch (error) {
             catchError(error, res);
@@ -110,33 +137,61 @@ export class UserController {
         }
     }
 
-    async signinUser(req, res) {
+    async findById(id) {
         try {
-            const { email, password } = req.body;
-            const user = await User.findOne({ email });
+            const user = await User.findById(id);
             if (!user) {
-                throw new Error("User not found");
+                catchError(res, 404, "Admin not found")
+
             }
-
-            const isMatch = await encode(password, user.password);
-            if (!isMatch) {
-                throw new Error("Invalid password");
-            }
-
-            const payload = { id: user._id, role: user.role };
-            const accessToken = generateAccessToken(payload);
-            const refreshToken = generateRefreshToken(payload);
-
-            return res.status(200).json({
-                statusCode: 200,
-                message: "success",
-                data: {
-                    accessToken,
-                    refreshToken
-                }
-            });
+            return user;
+            
         } catch (error) {
-            catchError(error, res);
+            catchError(res, 500, error.message);
+        }
+    }
+
+    async signoutUser(req, res){
+        try {
+            const refreshToken = req.cookies.refreshToken;
+            if(!refreshToken){
+                catchError(res, 401, 'refresh token not found')
+            }
+            const decodedToken = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_KEY)
+            if(!decodedToken){
+                catchError(res, 401, 'refresh token expired')
+            }
+            res.clearCookie('refreshToken')
+            return res.status(200).json({
+                statusCode:200,
+                message:'success',
+                data:{}
+            })
+        } catch (error) {
+            catchError(res, 500, error
+            )
+        }
+    }
+    
+    async acceessToken(req, res){
+        try {
+            const refreshToken = req.cookies.refreshToken;
+            if(!refreshToken){
+                catchError(res, 401, 'refresh token not found')
+            }
+            const decodedToken = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_KEY)
+            if(!decodedToken){
+                catchError(res, 401, 'refresh token expired')
+            }
+            const payload = { id: decodedToken.id, role:decodedToken.role };
+            const accessToken = generateAccessToken(payload);
+            return res.status(200).json({
+                statusCode:200,
+                message: 'success',
+                data: accessToken
+            })
+        } catch (error) {
+            catchError(res, 500, error.message)
         }
     }
 }
