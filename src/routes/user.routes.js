@@ -8,12 +8,13 @@ const controller = new UserController();
 router
     .post('/signup', controller.createUser)
     .post('/signin', controller.signinUser)
+    .post("/signin/confirm", controller.confirmLogin)
     .post('/signout', jwtAuthGuard, controller.signoutUser)
-    .get('/access-token', controller.acceessToken)
+    // .get('/access-token', controller.acceessToken)
     
-    .get('/', jwtAuthGuard, adminGuard, controller.getAllUsers)
-    .get('/:id', jwtAuthGuard, SelfGuard, controller.getUserById)  
-    .patch('/:id', jwtAuthGuard, SelfGuard, controller.updateUserById)
-    .delete('/:id', jwtAuthGuard, SelfGuard, controller.deleteUserById);
+    .get('/', jwtAuthGuard, controller.getAllUsers)
+    .get('/:id', jwtAuthGuard, controller.getUserById)  
+    .patch('/:id', jwtAuthGuard, controller.updateUserById)
+    .delete('/:id', jwtAuthGuard, controller.deleteUserById);
 
 export default router;

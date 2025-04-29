@@ -13,7 +13,6 @@ const PORT = +(process.env.PORT) || 3000;
 
 app.use(express.json());
 app.use(cookieParser())
-await connectDB()
 
 app.use("/user", userRouter)
 app.use("/car", carRouter)

@@ -7,6 +7,8 @@ const car = Joi.object({
     color: Joi.string().required().min(1)
 })
 
-export const carValidator = (data) => {
+const carValidator = (data) => {
     return car.validate(data);
 }
+
+export default carValidator
