@@ -65,7 +65,7 @@ export class UserController {
       const otp = generateOtp();
       const mailMessage = {
         from: process.env.SMTP_USER,
-        to: "umarkhankhodjaev@gmail.com",
+        to: "durozov46@gmail.com",
         subject: "Viscal Barca",
         text: otp,
       };
@@ -105,7 +105,6 @@ export class UserController {
       
     const payload = { id: user._id, role: user.role };
     const accessToken = generateAccessToken(payload);
-    console.log(accessToken);
     
     // const refreshToken = generateRefreshToken(payload)
     return res.json({
